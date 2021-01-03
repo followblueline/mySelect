@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Vue mySelect</title>
+	<!-- https://cdn.jsdelivr.net/npm/vue -->
+    <script src="libs/vue.js"></script>
+	<!-- IE 11 fix -->
+	<script src="libs/polyfills.js"></script>
+    <!-- external template za modal komponentu example -->
+    <script src="libs/myselect.js"></script>
+	<!-- load test data -->
+	<script src="countries.js"></script>
+    <link rel="stylesheet" href="libs/mySelect.css" />
+</head>
+<body>
+
+	<div id="vue-app">
+		<h1>Vue mySelect</h1>
+
+		<ul>
+            <li>Selected value: <strong>{{countrySelected}}</strong></li>
+			<li>Two-way binding test (enter code, ex. <i>BR</i>): <input v-model="countrySelected" /></li>
+            <li>Disabled: <strong>{{countryDisabled}}</strong> <button v-on:click="countryDisabled = !countryDisabled" style="display:inline-block">Disable/enable</button></li>
+		</ul>
+
+
+		<p class="alabel">
+          <label style="float: left;">Select value:</label> 
+            <span class="mySelect">
+              <my-select
+                  key="country_must_be_unique"
+                  name="country"
+                  :options="countries"
+                  :selected-value="countrySelected"
+                  :disabled="countryDisabled" 
+                  @change="countrySelected = arguments[0]"
+				  @blur="logger('blur', arguments[0])"
+                  no-result-message="Nema rezultata."
+                  placeholder="-"
+                  option-label="name"
+                  option-value="code"
+                  filter-by="name,code"
+                  allow-empty-option="true"
+                  :class="{
+                    'error': isInputInError('selectedValue'), 
+                  }">
+                  <!-- Enter any source object properties -->
+                <template v-slot:selected-option="slotProps">
+                  {{slotProps.selectedOption.obj.code}} - {{slotProps.selectedOption.obj ? slotProps.selectedOption.obj.name : ''}}
+                </template>
+                <template v-slot:label="labelSlotProps">
+                  {{labelSlotProps.option.obj.code}} - {{ labelSlotProps.option.obj.name }}
+                </template>
+              </my-select>
+            </span>
+        </p>
+		<div style="clear:both;"></div>
+		
+		<p>Content below (z-index and overflow test)</p>
+		
+	</div>
+	
+    <script>
+		Vue.component('my-select', mySelect); // custom select control
+
+        var vm = new Vue({
+            el: '#vue-app',
+            created: function () {
+                console.log("vue created");
+            },
+            data: {
+                countries: countries ,
+                countrySelected: null,
+                countryDisabled: false
+            },
+            methods: {
+				isInputInError: function(){
+					return false;
+				},
+				logger: function(msg){
+					console.log("logger: ",msg, arguments);
+				}
+            }
+
+        });
+
+    </script>
+</body>
+</html>
